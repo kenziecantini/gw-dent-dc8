@@ -1,0 +1,44 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Environment variable files
+.env
+*.env
+
+# VS Code settings
+.vscode/
+
+# Docker files
+*.log
+docker-compose.override.yml
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Python packaging
+*.egg-info/
+dist/
+build/
+
+# Pytest
+.pytest_cache/
+
+# Coverage
+htmlcov/
+coverage.xml
+*.cover
+*.py,cover
+
+# Database files (optional)
+*.sqlite3
+
+# Node modules (if used for frontend)
+node_modules/

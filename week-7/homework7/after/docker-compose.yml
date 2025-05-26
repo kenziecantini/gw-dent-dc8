@@ -3,7 +3,12 @@ services:
     build: .
     image: mywebapp
     ports:
-      - "15000:5000"
+      - "127.0.0.1:5000:5000"
+    read_only: true
+    mem_limit: 100m
+    pids_limit: 100
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - .:/app
     command: flask run --host=0.0.0.0 --port=5000

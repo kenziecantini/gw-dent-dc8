@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 from auth import verify_token
-
 app = Flask(__name__)
 
 @app.route('/')

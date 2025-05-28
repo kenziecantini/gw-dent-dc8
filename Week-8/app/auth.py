@@ -53,6 +53,7 @@ def auth_callback():
     token = oauth.keycloak.authorize_access_token()
     user = oauth.keycloak.parse_id_token(token)
     session['user'] = user
+    verify_token = token 
     return redirect(url_for('index'))
 
 @app.route('/logout')

@@ -2,6 +2,7 @@ import os
 from flask import Flask, redirect, url_for, session, jsonify
 from authlib.integrations.flask_client import OAuth
 
+
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "super-secret-key")
 
@@ -16,6 +17,13 @@ oauth.register(
     }
 )
 
+def verify_token(token):
+    try:
+        userinfo = oauth.keycloak.parse_id_token({'access_token': token})
+        return userinfo  # Typically includes email, name, etc.
+    except Exception as e:
+        print(f"Token verification failed: {e}")
+        return None
 
 def prepare_flask_request(req):
     """
@@ -53,7 +61,6 @@ def auth_callback():
     token = oauth.keycloak.authorize_access_token()
     user = oauth.keycloak.parse_id_token(token)
     session['user'] = user
-    verify_token = token 
     return redirect(url_for('index'))
 
 @app.route('/logout')

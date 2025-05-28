@@ -16,7 +16,7 @@ PROTECTED_URL = "http://localhost:5000/protected"
 PUBLIC_URL = "http://localhost:5000/public"
 
 # --- 1. Get Access Token ---
-print("🔐 Getting access token...")
+print("Getting access token...")
 
 payload = {
     "client_id": CLIENT_ID,
@@ -28,28 +28,28 @@ payload = {
 
 response = requests.post(TOKEN_URL, data=payload)
 if response.status_code != 200:
-    print("❌ Failed to get token")
+    print("Failed to get token")
     print(response.text)
     exit(1)
 
 token = response.json().get("access_token")
-print("✅ Access token received.\n")
+print("Access token received.\n")
 
 # --- 2. Test Public Endpoint ---
-print("🌐 Testing /public endpoint...")
+print("Testing /public endpoint...")
 public_res = requests.get(PUBLIC_URL)
-print(f"✅ Response: {public_res.status_code}")
+print(f"Response: {public_res.status_code}")
 print(public_res.text + "\n")
 
 # --- 3. Test Protected Endpoint WITHOUT token ---
-print("🚫 Testing /protected endpoint WITHOUT token...")
+print("Testing /protected endpoint WITHOUT token...")
 no_auth_res = requests.get(PROTECTED_URL)
-print(f"❌ Response: {no_auth_res.status_code}")
+print(f"Response: {no_auth_res.status_code}")
 print(no_auth_res.text + "\n")
 
 # --- 4. Test Protected Endpoint WITH token ---
-print("✅ Testing /protected endpoint WITH token...")
+print("Testing /protected endpoint WITH token...")
 headers = {"Authorization": f"Bearer {token}"}
 auth_res = requests.get(PROTECTED_URL, headers=headers)
-print(f"✅ Response: {auth_res.status_code}")
+print(f"Response: {auth_res.status_code}")
 print(auth_res.text)

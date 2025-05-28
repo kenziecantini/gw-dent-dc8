@@ -1,0 +1,46 @@
+{
+    "realm": "demo-realm",
+    "enabled": true,
+    "clients": [
+      {
+        "clientId": "flask-client",
+        "enabled": true,
+        "protocol": "openid-connect",
+        "publicClient": false,
+        "secret": "YOUR_SECRET_HERE",
+        "redirectUris": ["http://localhost:5000/*"],
+        "standardFlowEnabled": true,
+        "directAccessGrantsEnabled": true,
+        "serviceAccountsEnabled": true,
+        "authorizationServicesEnabled": true,
+        "bearerOnly": false
+      }
+    ],
+    "users": [
+      {
+        "username": "testuser",
+        "enabled": true,
+        "emailVerified": true,
+        "firstName": "Test",
+        "lastName": "User",
+        "email": "testuser@example.com",
+        "credentials": [
+          {
+            "type": "password",
+            "value": "testpass",
+            "temporary": false
+          }
+        ],
+        "realmRoles": ["user"]
+      }
+    ],
+    "roles": {
+      "realm": {
+        "user": {
+          "name": "user",
+          "description": "A basic user role"
+        }
+      }
+    }
+  }
+  

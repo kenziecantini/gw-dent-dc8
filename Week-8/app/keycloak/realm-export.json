@@ -35,12 +35,14 @@
       }
     ],
     "roles": {
-      "realm": {
-        "user": {
+      "realm": [
+        {
           "name": "user",
           "description": "A basic user role"
         }
-      }
+      ]
     }
-  }
+    
+        }
+
   

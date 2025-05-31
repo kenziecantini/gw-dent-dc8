@@ -1,0 +1,43 @@
+services:
+  # -----------------------------------------------------------------------
+  # Override: once the WAF is up, stop publishing port 3000 directly.
+  # -----------------------------------------------------------------------
+  juice:
+    ports: []                    # now reachable ONLY through the WAF on :80
+
+  # -----------------------------------------------------------------------
+  # ModSecurity CRS (Zero-Trust policy enforcement point)
+  # -----------------------------------------------------------------------
+  # compose/docker-compose.step-2.yml  ← add BACKEND=…
+  waf:
+    image: owasp/modsecurity-crs:nginx-alpine
+    environment:
+      - PORT=8080
+      - BACKEND=http://juice:3000
+      - MODSEC_RULE_ENGINE=On
+    depends_on: [ juice ]
+    networks:
+      public:
+      internal:
+    ports:
+      - "80:8080"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://juice:3000" ]
+      interval: 10s
+      retries: 5
+
+  # -----------------------------------------------------------------------
+  # Suricata IDS (network visibility / detect layer)
+  # -----------------------------------------------------------------------
+  suricata:
+    image: jasonish/suricata:latest
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    command: ["-i", "eth0", "-k", "none"]
+    networks:
+      - public
+
+networks:
+  public:
+  internal:

@@ -1,50 +1,125 @@
-Manual verification for one **DGA** and one **Legitimate** domain.
+Manual verification for one **legit** domain and one **DGA-like** domain using the end-to-end pipeline.
 
-## Setup
+## Prerequisites
+
+- Python 3.11
+- Repo checked out locally
+- The following files exist in `model/` (from Colab or local training):
+  - `DGA_Leader.zip`
+  - `model_meta.json`
+  - `leaderboard.csv`
+
+Optional (for GenAI playbook):
+```bash
+export GEMINI_API_KEY="YOUR_KEY"
+```
+> If not set, the app falls back to an offline playbook template—still acceptable for testing.
+
+---
+
+## 1) Sanity check
+
+From the project root (e.g., `Week-9 SEAS-8414/`):
 
 ```bash
-pip install -r requirements.txt
-python 1_train_and_export.py --csv data/dga_sample.csv --max_runtime_secs 120
+python -V
+ls model
 ```
 
-> Replace `data/dga_sample.csv` with your real dataset. Required columns: `domain,label` (1=DGA, 0=Legit).
+Expected:
+```
+DGA_Leader.zip  model_meta.json  leaderboard.csv
+```
 
 ---
 
-## Test 1: DGA Domain
+## 2) Legit domain test
 
-**Domain**: `xj2a9k-sd81zq.biz` (synthetic example with high entropy/digits)
+Command:
+```bash
+python 2_analyze_domain.py microsoft.com --model_dir model
+```
+
+Expect:
+- **Prediction**: `Legit` (or `label=0`)
+- **Probability of DGA**: low (typically `< 0.50`)
+- **SHAP summary**: contributions show **lower entropy** and **lower digit_ratio** pushing toward Legit
+- **Playbook**: a short action list tailored to a legit outcome (e.g., “no action / monitor only”)
+
+Sample (truncated):
+```
+Prediction: Legit (P[DGA]=0.12)
+Top features: entropy (-0.31), digit_ratio (-0.18), vowel_ratio (+0.05)
+Playbook:
+- No immediate block required.
+- Monitor DNS queries for similar lookalike domains.
+- Add to allowlist if internal services require it.
+```
+
+Pass criteria:
+- Final classification clearly indicates **Legit** (and DGA probability is low).
+- SHAP mentions key features (entropy, digit_ratio, etc.).
+- Playbook rendered without error.
+
+---
+
+## 3) DGA-like domain test
+
+Use a synthetic, high-entropy domain:
 
 ```bash
-python 2_analyze_domain.py xj2a9k-sd81zq.biz
+python 2_analyze_domain.py xj2a9k-sd81zq.biz --model_dir model
 ```
 
-**Expected**:
-- P(DGA) ≥ 0.5
-- SHAP lists `entropy` and `digit_ratio` as positive contributors
-- Playbook renders with concrete DNS/SIEM/EDR steps
+Expect:
+- **Prediction**: `DGA` (or `label=1`)
+- **Probability of DGA**: high (typically `> 0.50`)
+- **SHAP summary**: **higher entropy** and **higher digit_ratio** pushing toward DGA
+- **Playbook**: prescriptive actions (block, hunt, pivot)
 
----
-
-## Test 2: Legitimate Domain
-
-**Domain**: `microsoft.com`
-
-```bash
-python 2_analyze_domain.py microsoft.com
+Sample (truncated):
+```
+Prediction: DGA (P[DGA]=0.91)
+Top features: entropy (+0.42), digit_ratio (+0.25), hyphen_ratio (+0.07)
+Playbook:
+- Block the domain at DNS/Proxy.
+- Search logs for recent connections to xj2a9k-sd81zq.biz and related high-entropy siblings.
+- Isolate any host initiating outbound requests.
+- Notify SOC; open an incident with priority P2.
 ```
 
-**Expected**:
-- P(DGA) < 0.5
-- SHAP shows factors like `vowel_ratio` or lower `entropy` decreasing DGA risk
-- Playbook still prints (with "Legitimate" classification) for completeness
+Pass criteria:
+- Final classification clearly indicates **DGA** with high probability.
+- SHAP highlights entropy/digit features as primary drivers.
+- Playbook contains concrete, incident-response steps.
 
 ---
 
-## Edge Cases
+## 4) Troubleshooting
 
-- Subdomains with many labels: `cdn.assets.example.com` → entropy excludes dots but length includes them.
-- Short domains: `x.co` → low length may marginally increase risk depending on training.
-- Non-ASCII: such characters are stripped during cleaning; ensure your dataset uses ASCII domains.
+- **“Model not found / MOJO missing”**  
+  Ensure `model/DGA_Leader.zip` and `model/model_meta.json` are present. If missing, (re)train in Colab and download into `model/`.
+
+- **“Feature mismatch”**  
+  `2_analyze_domain.py` reads `model_meta.json["features"]` and uses that exact set. If you changed features in training, update `model_meta.json` or retrain.
+
+- **No GenAI outputs**  
+  If `GEMINI_API_KEY` isn’t set or outbound calls fail, the script prints an offline playbook template. This is acceptable for verification.
+
+- **Environment issues**  
+  Use Python 3.11. Install deps:
+  ```bash
+  pip install h2o shap pandas numpy scipy scikit-learn google-generativeai
+  ```
 
 ---
+
+## 5) What to submit
+
+- Link to your public GitHub repository containing:
+  - `1_train_and_export.py`, `2_analyze_domain.py`, `utils/`, `.github/workflows/lint.yml`
+  - `model/DGA_Leader.zip`, `model/model_meta.json`, `model/leaderboard.csv`
+  - `README.md` and this `TESTING.md`
+
+✔️ If both tests above produce the expected labels, SHAP summaries, and a playbook, your pipeline is functioning end-to-end.
+

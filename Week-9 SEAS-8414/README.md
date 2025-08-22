@@ -29,7 +29,7 @@ The final result is an end-to-end analyst tool that classifies a domain, explain
                    Output: Playbook
 
 
-###Repository Contents
+### Repository Contents
 1_train_and_export.py – Train AutoML model and export MOJO + metadata
 2_analyze_domain.py – Main application: classify, explain, and generate playbook
 utils/ – Feature engineering functions
@@ -38,16 +38,16 @@ README.md – Project documentation
 TESTING.md – Manual test steps for verification
 .github/workflows/lint.yml – GitHub Actions workflow (Flake8/Ruff)
 
-###Testing
+### Testing
 Manual verification is documented in TESTING.md, covering:
 One known DGA domain → prediction = DGA, explanation & playbook
 One known legit domain → prediction = Legitimate, explanation & playbook
 
-###Requirements
+### Requirements
 Python 3.11
 Packages: h2o, pandas, numpy, shap, google-generativeai
 
-###Usage
+### Usage
 
 ### 1. Train Model (if needed)
 ```bash

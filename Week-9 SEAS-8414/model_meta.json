@@ -1,0 +1,15 @@
+{
+  "features": [
+    "length",
+    "entropy",
+    "digit_ratio",
+    "hyphen_ratio",
+    "vowel_ratio"
+  ],
+  "label": "label",
+  "positive_class": "1",
+  "mojo_path": "DGA_Leader.zip",
+  "bin_path": "XRT_1_AutoML_1_20250822_171147",
+  "trained_at": "2025-08-22T17:14:21.262496+00:00",
+  "automl_leader": "XRT_1_AutoML_1_20250822_171147"
+}
